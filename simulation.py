@@ -11,8 +11,6 @@ def get_cardinal_moves(coordinate):
     return [north, south, east, west]
 
 
-
-
 def get_manhattan_distance(start, finish) -> int:
     row1, column1 = start
     row2, colum2 = finish

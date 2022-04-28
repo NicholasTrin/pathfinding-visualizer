@@ -93,7 +93,6 @@ class Grid:
             time.sleep(self.simulation_speed)
 
         for cell in self.simulation.shortest_path:
-            #print(cell.coordinate)
             self.simulation_data['shortest_path'].insert(parent='',iid=cell.coordinate,index=END,values=(cell.coordinate,cell.f,cell.g,cell.h))
             column,row = cell.coordinate
             x1 = column * self.cell_width
