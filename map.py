@@ -4,9 +4,9 @@ from map_constants import *
 
 class Map:
 
-    def __init__(self, map_height=10, map_width=10, weights=[0.6, 0.25, 0.15]):
-        self.map_height = 10
-        self.map_width = 10
+    def __init__(self, map_height=10, map_width=20, weights=[0.6, 0.25, 0.15]):
+        self.map_height = map_height
+        self.map_width = map_width
         self.map_units = map_width * map_height
         self.space_to_wall_weights = weights
         self.map = None

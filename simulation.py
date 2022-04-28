@@ -63,10 +63,10 @@ class AStarSearch:
         return Cell(coordinate, g, h, f)
 
     def get_movement_cost(self, coordinate):
-        row, column = coordinate
-        if self.map[row * self.map_width + column] == WATER:
+        coordinate = self.get_two_to_one_dimensional_coordinates(coordinate)
+        if self.map[coordinate] == WATER:
             return 2
-        elif self.map[row * self.map_width + column] == SPACE:
+        elif self.map[coordinate] == SPACE:
             return 1
 
     def get_successors(self, coordinate) -> list:
@@ -101,7 +101,8 @@ class AStarSearch:
         return abs(start[0] - finish[0]) + abs(start[1] - finish[1])
 
     def get_two_to_one_dimensional_coordinates(self, coordinates) -> int:
-        return coordinates[0] * self.map_width + coordinates[1]
+        column,row = coordinates
+        return column + row * self.map_width
 
     def get_one_to_two_dimensional_coordinates(self, coordinates) -> list:
         return [coordinates // self.map_width, coordinates % self.map_width]
