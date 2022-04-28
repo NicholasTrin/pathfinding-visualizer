@@ -43,45 +43,39 @@ class Grid:
         self.scales['simulation_speed'].set(50)
         self.scales['simulation_speed'].pack()
 
-        attributes = ('Coordinate (X,Y)', 'F (Total Cost)', 'G (Movement Cost)', 'H (Heuristic)')
+        self.simulation_data['attributes'] = ('Coordinate (X,Y)', 'F (Total Cost)', 'G (Movement Cost)', 'H (Heuristic)', 'Reached Goal?')
         self.simulation_data['shortest_path'] = ttk.Treeview(self.root)
-        self.simulation_data['shortest_path']['columns'] = attributes
+        self.simulation_data['shortest_path']['columns'] = self.simulation_data['attributes']
         self.simulation_data['shortest_path'].column("#0", width=0, stretch=NO)
         self.simulation_data['shortest_path'].heading("#0", text='', anchor=N)
-        for attribute in attributes:
+        for attribute in self.simulation_data['attributes']:
             self.simulation_data['shortest_path'].column(attribute, anchor=N,width=150)
             self.simulation_data['shortest_path'].heading(attribute, text=attribute, anchor=CENTER)
         self.simulation_data['shortest_path'].pack()
-        self.simulation_data['reached_goal'] = self.canvas.create_text((self.map_width + 5) * self.cell_width + 15,
-                                                             self.cell_height, anchor=N, text="Reached Goal:",
-                                                             fill='black')
 
     def configure_grid(self, event=None):
         for column in range(self.map_width):
             for row in range(self.map_height):
-                print(column,row)
                 x1 = column * self.cell_width
                 y1 = row * self.cell_height
                 x2 = x1 + self.cell_width
                 y2 = y1 + self.cell_height
                 if self.map.map[column + row * self.map_width] == WALL:
-                    self.squares[row, column] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='black', tags='rect')
+                    self.squares[column, row] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='black', tags='rect')
                 elif self.map.map[column + row * self.map_width] == WATER:
-                    self.squares[row, column] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='blue', tags='rect')
+                    self.squares[column, row] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='blue', tags='rect')
                 else:
-                    self.squares[row, column] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='white', tags='rect')
-                self.cost[row, column] = self.canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text="-", fill='black',
+                    self.squares[column, row] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='white', tags='rect')
+                self.cost[column, row] = self.canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text="-", fill='black',
                                                                  font='Helvetica 14 bold')
-        #self.show_data['shortest_path'] = self.canvas.create_text((self.map_width + 1) * self.cell_width + 15,self.cell_height, anchor=N, text="Shortest Path:",                                                       fill='black')
-        #self.show_data['reached_goal'] = self.canvas.create_text((self.map_width + 5) * self.cell_width + 15,self.cell_height, anchor=N, text="Reached Goal:",fill='black')
 
     def reset_simulation(self, event=None):
         self.canvas.delete('all')
         self.map = Map()
         self.squares = {}
         self.cost = {}
-        self.show_data = {}
         self.simulation = AStarSearch(self.map)
+        self.simulation_data['shortest_path'].delete(*self.simulation_data['shortest_path'].get_children())
         self.configure_grid()
         self.buttons['button_simulation'].config(state=ACTIVE)
 
@@ -89,17 +83,18 @@ class Grid:
         self.buttons['button_simulation'].config(state=DISABLED)
         self.buttons['button_reset_simulation'].config(state=DISABLED)
         for cell in self.simulation.traversal_path:
-            column,row = cell.coordinate
+            column, row = cell.coordinate
             if self.map.map[column + row * self.map_width] == WATER:
-                self.canvas.itemconfig(self.squares[row, column], fill='#6AFB92')
+                self.canvas.itemconfig(self.squares[column, row], fill='#6AFB92')
             else:
-                self.canvas.itemconfig(self.squares[row, column], fill='#C04000')
-            self.canvas.itemconfig(self.cost[row, column], fill='black', text=cell.g)
+                self.canvas.itemconfig(self.squares[column, row], fill='#C04000')
+            self.canvas.itemconfig(self.cost[column, row], fill='black', text=cell.g)
             self.canvas.update()
             time.sleep(self.simulation_speed)
 
         for cell in self.simulation.shortest_path:
-            self.simulation_data['shortest_path'].insert(parent='',index=END,values=(cell.coordinate,cell.f,cell.g,cell.h))
+            #print(cell.coordinate)
+            self.simulation_data['shortest_path'].insert(parent='',iid=cell.coordinate,index=END,values=(cell.coordinate,cell.f,cell.g,cell.h))
             column,row = cell.coordinate
             x1 = column * self.cell_width
             y1 = row * self.cell_height
@@ -108,8 +103,7 @@ class Grid:
             self.canvas.create_line(x1, y1, x2, y2)
             self.canvas.update()
             time.sleep(self.simulation_speed)
-        self.canvas.itemconfig(self.simulation_data['reached_goal'],
-                               text="Reached Goal: {}".format(self.simulation.reached_goal))
+        self.simulation_data['shortest_path'].set(item=(0,0), column='Reached Goal?', value=str(self.simulation.reached_goal))
         self.buttons['button_reset_simulation'].config(state=ACTIVE)
 
     def set_delay(self, value):
