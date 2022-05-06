@@ -1,4 +1,5 @@
-from cell import Cell
+from .algorithmTemplate import *
+
 
 def get_manhattan_distance(start, finish) -> int:
     row1, column1 = start
@@ -6,15 +7,10 @@ def get_manhattan_distance(start, finish) -> int:
     return abs(row1 - row2) + abs(column1 - colum2)
 
 
-class AStarSearch:
+class AStarSearch(AlgorithmTemplate):
 
-    def __init__(self, map):
-        self.start = (0, 0)
-        self.goal = (map.map_width - 1, map.map_height - 1)
-        self.reached_goal = False
-        self.map_width = map.map_width
-        self.map_height = map.map_height
-        self.map = map
+    def __init__(self, _map):
+        super().__init__(_map)
         self.traversal_path = self.search()
         self.shortest_path = self.get_shortest_path(self.traversal_path)
 
@@ -39,13 +35,6 @@ class AStarSearch:
                     open.append(successor)
         return closed
 
-    def get_successors(self, cell) -> list:
-        cardinal_moves = cell.get_cardinal_moves()
-        for move in list(cardinal_moves):
-            if not self.map.is_valid_move(move):
-                cardinal_moves.remove(move)
-        return cardinal_moves
-
     def get_cell(self, coordinate, q=None) -> Cell:
         if q:
             g = q.g + self.map.get_movement_cost(coordinate)
@@ -54,13 +43,6 @@ class AStarSearch:
         h = get_manhattan_distance(coordinate, self.goal)
         f = g + h
         return Cell(coordinate, g, h, f)
-
-    def is_goal(self, coordinate) -> bool:
-        if coordinate == self.goal:
-            self.reached_goal = True
-            return True
-        else:
-            return False
 
     def get_shortest_path(self, evaluated_cells) -> list:
         def is_cardinal_move() -> bool:
@@ -72,9 +54,9 @@ class AStarSearch:
         evaluated_cells = sorted(evaluated_cells, key=lambda cell: cell.g, reverse=True)
         shortest_path = [evaluated_cells[0]]
         for cell in evaluated_cells:
+            print(cell.coordinate,cell.g)
             if cell.g < shortest_path[-1].g and is_cardinal_move():
                 shortest_path.append(cell)
             if cell.coordinate == self.start:
                 break
         return reversed(shortest_path)
-

@@ -1,3 +1,5 @@
+from .algorithmTemplate import *
 
-class Dijkstra():
+
+class Dijkstra(AlgorithmTemplate):
     pass

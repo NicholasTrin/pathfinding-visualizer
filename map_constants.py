@@ -1,3 +1,4 @@
 SPACE = 0
 WALL = 1
 WATER = 2
+MOUNTAIN = 3

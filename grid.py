@@ -2,7 +2,7 @@ import time
 import tkinter
 from tkinter import *
 from tkinter import ttk
-from algorithms import dijkstra,bds,aStar
+from algorithms import aStar, bds, dijkstra
 from map import *
 
 
@@ -51,7 +51,7 @@ class Grid:
         self.data_entry['algorithm_selection'].bind("<<ListboxSelect>>", self.algorithm_selected)
         self.data_entry['algorithm_selection'].pack()
         self.simulation_data['attributes'] = (
-        'Coordinate (X,Y)', 'F (Total Cost)', 'G (Movement Cost)', 'H (Heuristic)', 'Reached Goal?')
+            'Coordinate (X,Y)', 'F (Total Cost)', 'G (Movement Cost)', 'H (Heuristic)', 'Reached Goal?')
         self.simulation_data['shortest_path'] = ttk.Treeview(self.root)
         self.simulation_data['shortest_path']['columns'] = self.simulation_data['attributes']
         self.simulation_data['shortest_path'].column("#0", width=0, stretch=NO)
@@ -72,8 +72,10 @@ class Grid:
                     self.squares[column, row] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='black', tags='rect')
                 elif self.map.map[column + row * self.map_width] == WATER:
                     self.squares[column, row] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='blue', tags='rect')
-                else:
+                elif self.map.map[column + row * self.map_width] == SPACE:
                     self.squares[column, row] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='white', tags='rect')
+                elif self.map.map[column + row * self.map_width] == MOUNTAIN:
+                    self.squares[column, row] = self.canvas.create_rectangle(x1, y1, x2, y2, fill='gray', tags='rect')
                 self.cost[column, row] = self.canvas.create_text((x1 + x2) // 2, (y1 + y2) // 2, text="-", fill='black',
                                                                  font='Helvetica 14 bold')
 
@@ -94,26 +96,32 @@ class Grid:
         for cell in self.algorithm.traversal_path:
             column, row = cell.coordinate
             if self.map.map[column + row * self.map_width] == WATER:
-                self.canvas.itemconfig(self.squares[column, row], fill='#6AFB92')
-            else:
+                self.canvas.itemconfig(self.squares[column, row], fill='#21618C')
+            elif self.map.map[column + row * self.map_width] == SPACE:
                 self.canvas.itemconfig(self.squares[column, row], fill='#C04000')
-            self.canvas.itemconfig(self.cost[column, row], fill='black', text=cell.g)
+            elif self.map.map[column + row * self.map_width] == MOUNTAIN:
+                self.canvas.itemconfig(self.squares[column, row], fill='#566573')
+            self.canvas.itemconfig(self.cost[column, row], fill='black', text=cell.f)
             self.canvas.update()
             time.sleep(self.simulation_speed)
 
-        for cell in self.algorithm.shortest_path:
-            self.simulation_data['shortest_path'].insert(parent='', iid=cell.coordinate, index=END,
-                                                         values=(cell.coordinate, cell.f, cell.g, cell.h))
-            column, row = cell.coordinate
-            x1 = column * self.cell_width
-            y1 = row * self.cell_height
-            x2 = x1 + self.cell_width
-            y2 = y1 + self.cell_height
-            self.canvas.create_line(x1, y1, x2, y2)
-            self.canvas.update()
-            time.sleep(self.simulation_speed)
-        self.simulation_data['shortest_path'].set(item=(0, 0), column='Reached Goal?',
-                                                  value=str(self.algorithm.reached_goal))
+        if self.algorithm.reached_goal:
+            for cell in self.algorithm.shortest_path:
+                self.simulation_data['shortest_path'].insert(parent='', iid=cell.coordinate, index=END,
+                                                             values=(cell.coordinate, cell.f, cell.g, cell.h))
+                column, row = cell.coordinate
+                x1 = column * self.cell_width
+                y1 = row * self.cell_height
+                x2 = x1 + self.cell_width
+                y2 = y1 + self.cell_height
+                self.canvas.create_line(x1, y1, x2, y2)
+                self.canvas.update()
+                time.sleep(self.simulation_speed)
+            self.simulation_data['shortest_path'].set(item=(0, 0), column='Reached Goal?',
+                                                      value=str(self.algorithm.reached_goal))
+        else:
+            self.simulation_data['shortest_path'].insert(parent='', iid=0, index=END,
+                                                         value=('-', '-', '-', '-', str(self.algorithm.reached_goal)))
         self.buttons['button_reset_simulation'].config(state=ACTIVE)
         self.data_entry['algorithm_selection'].config(state=NORMAL)
 
