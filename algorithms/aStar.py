@@ -26,7 +26,7 @@ class AStarSearch(AlgorithmTemplate):
                     q = cell
             open.remove(q)
             closed.append(q)
-            if self.is_goal(q.coordinate):
+            if self.is_goal(q):
                 return closed
             for coordinate in self.get_successors(q):
                 successor = self.get_cell(coordinate, q)

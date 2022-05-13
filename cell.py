@@ -1,5 +1,5 @@
 class Cell:
-    def __init__(self, coordinate, g, h, f):
+    def __init__(self, coordinate, g=0, h=0, f=0):
         self.coordinate = coordinate
         self.g = g
         self.h = h

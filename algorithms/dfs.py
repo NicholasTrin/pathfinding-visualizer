@@ -1,7 +1,7 @@
 from .algorithmTemplate import *
 
 
-class BDS(AlgorithmTemplate):
+class DFS(AlgorithmTemplate):
 
     def __init__(self, _map):
         super().__init__(_map)
@@ -12,7 +12,7 @@ class BDS(AlgorithmTemplate):
         to_traverse = [[self.get_cell(self.start)]]
         visited = set()
         while len(to_traverse):
-            current_path = to_traverse.pop(0)
+            current_path = to_traverse.pop()
             evaluate_cell = current_path[-1]
             self.traversal_path.append(evaluate_cell)
             if self.is_goal(evaluate_cell):

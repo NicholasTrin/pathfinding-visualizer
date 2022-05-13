@@ -2,7 +2,7 @@ import time
 import tkinter
 from tkinter import *
 from tkinter import ttk
-from algorithms import aStar, bds, dijkstra
+from algorithms import aStar, bds, dijkstra, dfs
 from map import *
 
 
@@ -46,8 +46,8 @@ class Grid:
         self.scales['simulation_speed'].set(50)
         self.scales['simulation_speed'].pack()
         self.data_entry['algorithm_selection'] = Listbox(master=self.root, listvariable=tkinter.StringVar(
-            value=('A*', 'Breadth First Search', 'Dijkstra')),
-                                                         selectmode=SINGLE, height=3)
+            value=('A*', 'Breadth First Search', 'Depth First Search', 'Dijkstra',)),
+                                                         selectmode=SINGLE, height=5)
         self.data_entry['algorithm_selection'].bind("<<ListboxSelect>>", self.algorithm_selected)
         self.data_entry['algorithm_selection'].pack()
         self.simulation_data['attributes'] = (
@@ -132,9 +132,11 @@ class Grid:
             if algorithm == 'A*':
                 self.algorithm = aStar.AStarSearch(self.map)
             elif algorithm == 'Breadth First Search':
-                self.algorithm = bds.BDS()
+                self.algorithm = bds.BDS(self.map)
+            elif algorithm == 'Depth First Search':
+                self.algorithm = dfs.DFS(self.map)
             elif algorithm == 'Dijkstra':
-                dijkstra.Dijkstra()
+                self.algorithm = dijkstra.Dijkstra(self.map)
 
     def set_delay(self, value):
         self.simulation_speed = float(value) / 100

@@ -19,21 +19,18 @@ class AlgorithmTemplate(ABC):
                 cardinal_moves.remove(move)
         return cardinal_moves
 
-    def is_goal(self, coordinate) -> bool:
-        if coordinate == self.goal:
+    def is_goal(self, cell) -> bool:
+        if cell.coordinate == self.goal:
             self.reached_goal = True
             return True
         else:
             return False
 
     @abstractmethod
-    def search(self, coordinate) -> list:
+    def search(self) -> list:
         pass
 
     @abstractmethod
-    def get_cell(self, coordinate, q):
+    def get_cell(self, coordinate, previous_cell):
         pass
 
-    @abstractmethod
-    def get_shortest_path(self, evaluated_cells) -> list:
-        pass
