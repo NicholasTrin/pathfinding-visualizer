@@ -19,7 +19,7 @@ class BDS(AlgorithmTemplate):
                 return current_path
             for move in self.get_successors(evaluate_cell):
                 if move not in visited:
-                    new_path = current_path + [self.get_cell(move, evaluate_cell)]
+                    new_path = current_path + [self.get_cell(move)]
                     visited.add(move)
                     to_traverse.append(new_path)
 

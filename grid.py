@@ -3,7 +3,7 @@ import tkinter
 from tkinter import *
 from tkinter import ttk
 from algorithms import aStar, bds, dijkstra, dfs
-from map import *
+from map.map import *
 
 
 class Grid:
@@ -81,7 +81,7 @@ class Grid:
 
     def reset_simulation(self, event=None):
         self.canvas.delete('all')
-        self.map = Map()
+        self.map.generate_map()
         self.squares = {}
         self.cost = {}
         self.algorithm_selected()

@@ -1,5 +1,5 @@
 import numpy as np
-from map_constants import *
+from .map_constants import *
 
 
 class Map:
@@ -12,12 +12,14 @@ class Map:
         self.map = None
         self.generate_map()
 
-    def generate_map(self) -> list:
-        while self.check_map_validity() is False:
-            self.map = np.random.choice([SPACE, WALL, WATER, MOUNTAIN], size=self.map_units, p=self.space_to_wall_weights)
+    def generate_map(self):
+        _map = None
+        while self.check_map_validity(_map) is False:
+            _map = np.random.choice([SPACE, WALL, WATER, MOUNTAIN], size=self.map_units, p=self.space_to_wall_weights)
+        self.map = _map
 
-    def check_map_validity(self) -> bool:
-        if self.map is None or self.map[0] == WALL or self.map[self.map_units - 1] == WALL:
+    def check_map_validity(self, _map) -> bool:
+        if _map is None or _map[0] == WALL or _map[self.map_units - 1] == WALL:
             return False
         else:
             return True
