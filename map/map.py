@@ -4,7 +4,7 @@ from .map_constants import *
 
 class Map:
 
-    def __init__(self, map_height=10, map_width=20, weights=[0.5, 0.25, 0.15,0.10]):
+    def __init__(self, map_height=10, map_width=20, weights= [0.5, 0.25, 0.15,0.10]):
         self.map_height = map_height
         self.map_width = map_width
         self.map_units = map_width * map_height
@@ -15,7 +15,7 @@ class Map:
     def generate_map(self):
         _map = None
         while self.check_map_validity(_map) is False:
-            _map = np.random.choice([SPACE, WALL, WATER, MOUNTAIN], size=self.map_units, p=self.space_to_wall_weights)
+            _map = np.random.choice(CONSTANTS, size=self.map_units, p=self.space_to_wall_weights)
         self.map = _map
 
     def check_map_validity(self, _map) -> bool:
