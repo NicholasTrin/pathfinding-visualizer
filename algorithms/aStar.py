@@ -54,7 +54,6 @@ class AStarSearch(AlgorithmTemplate):
         evaluated_cells = sorted(evaluated_cells, key=lambda cell: cell.g, reverse=True)
         shortest_path = [evaluated_cells[0]]
         for cell in evaluated_cells:
-            print(cell.coordinate,cell.g)
             if cell.g < shortest_path[-1].g and is_cardinal_move():
                 shortest_path.append(cell)
             if cell.coordinate == self.start:

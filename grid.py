@@ -8,17 +8,18 @@ from map.map import *
 
 class Grid:
 
-    def __init__(self, root, map_width=None, map_height=None):
-        self.map = Map()
-        self.map_width = self.map.map_width
-        self.map_height = self.map.map_height
+    def __init__(self, root):
+        self.map_width = 30
+        self.map_height = 10
+        self.map_probabilities = [0.5, 0.25, 0.15, 0.10]
+        self.map = Map(self.map_height, self.map_width, self.map_probabilities)
         self.cell_width = 30
         self.cell_height = 30
 
         self.algorithm = None
         self.simulation_speed = 0
 
-        self.pixel_height = 414
+        self.pixel_height = 800
         self.pixel_width = 896
 
         self.squares = {}
@@ -30,7 +31,7 @@ class Grid:
 
         self.root = root
         self.canvas = Canvas(root, height=self.pixel_height, width=self.pixel_width, bg='white')
-        self.canvas.pack(fill=BOTH, expand=True)
+        self.canvas.pack(fill=BOTH, side=TOP, expand=True)
 
         self.configure_ui()
         self.configure_grid()
@@ -43,23 +44,88 @@ class Grid:
         self.buttons['button_reset_simulation'].pack()
         self.scales['simulation_speed'] = Scale(self.root, from_=0.1, to=100, command=self.set_delay, orient=HORIZONTAL,
                                                 length=600, tickinterval=25, label="Simulation Speed")
-        self.scales['simulation_speed'].set(50)
+        self.scales['simulation_speed'].set(25)
         self.scales['simulation_speed'].pack()
         self.data_entry['algorithm_selection'] = Listbox(master=self.root, listvariable=tkinter.StringVar(
             value=('A*', 'Breadth First Search', 'Depth First Search', 'Dijkstra',)),
                                                          selectmode=SINGLE, height=5)
+        self.data_entry['algorithm_selection'].select_set(0)
         self.data_entry['algorithm_selection'].bind("<<ListboxSelect>>", self.algorithm_selected)
+        self.data_entry['algorithm_selection'].event_generate("<<ListboxSelect>>")
         self.data_entry['algorithm_selection'].pack()
+
+        self.data_entry['width_label'] = Label(self.canvas, text='Map Width')
+        self.data_entry['width_label'].pack(side=LEFT, anchor=S)
+        self.data_entry['map_inputs_width'] = Entry(self.canvas, width=20)
+        self.data_entry['map_inputs_width'].insert(END, '30')
+        self.data_entry['map_inputs_width'].pack(side=LEFT, anchor=S)
+        self.data_entry['height_label'] = Label(self.canvas, text='Map Height')
+        self.data_entry['height_label'].pack(side=LEFT, anchor=S)
+        self.data_entry['map_inputs_height'] = Entry(self.canvas, width=20)
+        self.data_entry['map_inputs_height'].insert(END, '10')
+        self.data_entry['map_inputs_height'].pack(side=LEFT, anchor=S)
+        self.data_entry['probabilities_label'] = Label(self.canvas,
+                                                       text='Tile Probabilities (Space, Wall, Water, Mountain)')
+        self.data_entry['probabilities_label'].pack(side=LEFT, anchor=S)
+        self.data_entry['map_inputs_probabilities'] = Entry(self.canvas, width=20)
+        self.data_entry['map_inputs_probabilities'].insert(END, '0.5, 0.25, 0.15,0.10')
+        self.data_entry['map_inputs_probabilities'].pack(side=LEFT, anchor=S)
+        self.buttons['map_inputs'] = Button(self.canvas, text='Input Map Data', width=20, command=self.enter_map_data)
+        self.buttons['map_inputs'].pack(side=LEFT, anchor=S)
+        self.data_entry['error_string_var'] = StringVar()
+        self.data_entry['error_string_var'].set('No Errors')
+        self.data_entry['error_label'] = Label(self.canvas, textvariable=self.data_entry['error_string_var'])
+        self.data_entry['error_label'].pack(side=LEFT, anchor=SW)
+
         self.simulation_data['attributes'] = (
             'Coordinate (X,Y)', 'F (Total Cost)', 'G (Movement Cost)', 'H (Heuristic)', 'Reached Goal?')
         self.simulation_data['shortest_path'] = ttk.Treeview(self.root)
         self.simulation_data['shortest_path']['columns'] = self.simulation_data['attributes']
         self.simulation_data['shortest_path'].column("#0", width=0, stretch=NO)
-        self.simulation_data['shortest_path'].heading("#0", text='', anchor=N)
+        self.simulation_data['shortest_path'].heading("#0", text='')
         for attribute in self.simulation_data['attributes']:
-            self.simulation_data['shortest_path'].column(attribute, anchor=N, width=150)
-            self.simulation_data['shortest_path'].heading(attribute, text=attribute, anchor=CENTER)
-        self.simulation_data['shortest_path'].pack()
+            self.simulation_data['shortest_path'].column(attribute, width=150)
+            self.simulation_data['shortest_path'].heading(attribute, text=attribute)
+        self.simulation_data['shortest_path'].pack(side=BOTTOM, anchor=S)
+
+    def enter_map_data(self, event=None):
+        errors = ''
+        probabilities = self.data_entry['map_inputs_probabilities'].get().split(',')
+        try:
+            probabilities = [float(probability) for probability in probabilities]
+            if sum(probabilities) != 1:
+                errors += "Invalid probability: must sum to 1.\n"
+            if len(probabilities) != 4:
+                errors += "Invalid probabilities: maximum four entries, for each tile respectively.\n"
+            else:
+                self.map.weights = probabilities
+        except ValueError:
+            errors += "Invalid probability: numbers only.\n"
+
+        try:
+            width = int(self.data_entry['map_inputs_width'].get())
+            if 5 <= width <= 50:
+                self.map.map_width = width
+                self.map_width = width
+            else:
+                errors += 'Map width: must be between 5 and 50\n'
+        except ValueError:
+            errors += "Map width: must be a number\n"
+
+        try:
+            height = int(self.data_entry['map_inputs_height'].get())
+            if 5 <= height <= 15:
+                self.map.map_height = height
+                self.map_height = height
+            else:
+                errors += 'Map height: must be between 5 and 15\n'
+        except ValueError:
+            errors += "Map height: must be a number\n"
+        if not errors:
+            errors += "No errors"
+        else:
+            errors = errors[0:-1]
+        self.data_entry['error_string_var'].set(errors)
 
     def configure_grid(self, event=None):
         for column in range(self.map_width):

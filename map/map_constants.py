@@ -1,4 +1,10 @@
+#Space Identifier
 SPACE = 0
 WALL = 1
 WATER = 2
 MOUNTAIN = 3
+#SPACE COST
+SPACE_C = 1
+WATER_C = 2
+MOUNTAIN_C = 3
+WALL_C = None

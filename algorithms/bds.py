@@ -24,5 +24,4 @@ class BDS(AlgorithmTemplate):
                     to_traverse.append(new_path)
 
     def get_cell(self, coordinate, previous_cell=None):
-        return Cell(coordinate,'-','-','-')
-
+        return Cell(coordinate, '-', '-', '-')
