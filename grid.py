@@ -73,7 +73,7 @@ class Grid:
         self.buttons['map_inputs'] = Button(self.canvas, text='Input Map Data', width=20, command=self.enter_map_data)
         self.buttons['map_inputs'].pack(side=LEFT, anchor=S)
         self.data_entry['error_string_var'] = StringVar()
-        self.data_entry['error_string_var'].set('No Errors')
+        self.data_entry['error_string_var'].set('No errors.')
         self.data_entry['error_label'] = Label(self.canvas, textvariable=self.data_entry['error_string_var'])
         self.data_entry['error_label'].pack(side=LEFT, anchor=SW)
 
@@ -122,7 +122,7 @@ class Grid:
         except ValueError:
             errors += "Map height: must be a number\n"
         if not errors:
-            errors += "No errors"
+            errors += "No errors."
         else:
             errors = errors[0:-1]
         self.data_entry['error_string_var'].set(errors)
