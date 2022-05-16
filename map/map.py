@@ -16,7 +16,7 @@ class Map:
         self.map_units = self.map_width * self.map_height
         _map = None
         while self.check_map_validity(_map) is False:
-            _map = np.random.choice([SPACE, WALL, WATER, MOUNTAIN], size=self.map_units, p=self.weights)
+            _map = np.random.choice(CONSTANTS_ID, size=self.map_units, p=self.weights)
         self.map = _map
 
     def check_map_validity(self, _map) -> bool:
