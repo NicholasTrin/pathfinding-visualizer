@@ -123,6 +123,7 @@ class Grid:
             errors += "Map height: must be a number\n"
         if not errors:
             errors += "No errors."
+            self.reset_simulation()
         else:
             errors = errors[0:-1]
         self.data_entry['error_string_var'].set(errors)
@@ -159,6 +160,7 @@ class Grid:
         self.data_entry['algorithm_selection'].config(state=DISABLED)
         self.buttons['button_simulation'].config(state=DISABLED)
         self.buttons['button_reset_simulation'].config(state=DISABLED)
+        self.buttons['map_inputs'].config(state=DISABLED)
         for cell in self.algorithm.traversal_path:
             column, row = cell.coordinate
             if self.map.map[column + row * self.map_width] == WATER:
@@ -190,6 +192,7 @@ class Grid:
                                                          value=('-', '-', '-', '-', str(self.algorithm.reached_goal)))
         self.buttons['button_reset_simulation'].config(state=ACTIVE)
         self.data_entry['algorithm_selection'].config(state=NORMAL)
+        self.buttons['map_inputs'].config(state=ACTIVE)
 
     def algorithm_selected(self, event=None):
         selected_indices = self.data_entry['algorithm_selection'].curselection()
